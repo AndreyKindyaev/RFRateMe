@@ -10,9 +10,8 @@
 
 @interface RFRateMe : NSObject
 
-+(void)showRateAlert;
-+(void)showRateAlertAfterTimesOpened:(int)times;
-+(void)showRateAlertAfterDays:(int)days;
-
++ (void)showRateAlertForAppStoreUrl:(NSString *)appStoreUrl;
++ (void)showRateAlertForAppStoreUrl:(NSString *)appStoreUrl afterTimesOpened:(int)times;
++ (void)showRateAlertForAppStoreUrl:(NSString *)appStoreUrl afterDays:(int)times;
 
 @end

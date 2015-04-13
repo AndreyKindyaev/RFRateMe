@@ -10,13 +10,11 @@
 #import "UIAlertView+NSCookbook.h"
 
 #define kNumberOfDaysUntilShowAgain 3
-#define kAppStoreAddress @"https://itunes.apple.com/us/app/jobsy/id687059035"
-#define kAppName @"MyApp"
 
 @implementation RFRateMe
 
-+(void)showRateAlert {
-    
++ (void)showRateAlertForAppStoreUrl:(NSString *)appStoreUrl
+{
     //If rate was completed, we just return if True
     BOOL rateCompleted = [[NSUserDefaults standardUserDefaults] boolForKey:@"RFRateCompleted"];
     if (rateCompleted) return;
@@ -48,11 +46,12 @@
     }
     
     //Show rate alert
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(kAppName, @"")
-                                                        message:[NSString stringWithFormat:@"If you enjoy %@, would you mind taking a moment to rate it? It won’t take more than a minute. Thanks for your support!",kAppName]
+    NSString *appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:appName
+                                                        message:[NSString stringWithFormat:NSLocalizedString(@"If you enjoy %@, would you mind taking a moment to rate it? It won’t take more than a minute. Thanks for your support!", nil), appName]
                                                        delegate:nil
-                                              cancelButtonTitle:NSLocalizedString(@"Never ask me again", @"")
-                                              otherButtonTitles:NSLocalizedString(@"Rate it now", @""),NSLocalizedString(@"Remind me later",@""), nil];
+                                              cancelButtonTitle:NSLocalizedString(@"Never ask me again", nil)
+                                              otherButtonTitles:NSLocalizedString(@"Rate it now", nil), NSLocalizedString(@"Remind me later", nil), nil];
     
     [alertView showWithCompletion:^(UIAlertView *alertView, NSInteger buttonIndex) {
         
@@ -69,7 +68,7 @@
                 NSLog(@"Rate it now");
                 [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"RFRateCompleted"];
                 [[NSUserDefaults standardUserDefaults] synchronize];
-                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:kAppStoreAddress]];
+                [[UIApplication sharedApplication] openURL:[NSURL URLWithString:appStoreUrl]];
                 
                 break;
             case 2:
@@ -87,9 +86,9 @@
     }];
 }
 
-+(void)showRateAlertAfterTimesOpened:(int)times {
++ (void)showRateAlertForAppStoreUrl:(NSString *)appStoreUrl afterTimesOpened:(int)times
+{
     //Thanks @kylnew for feedback and idea!
-    
     BOOL rateCompleted = [[NSUserDefaults standardUserDefaults] boolForKey:@"RFRateCompleted"];
     if (rateCompleted) return;
     
@@ -99,15 +98,12 @@
     [defaults synchronize];
     NSLog(@"App has been opened %ld times", (long)[defaults integerForKey:@"timesOpened"]);
     if([defaults integerForKey:@"timesOpened"] >= times){
-        [RFRateMe showRateAlert];
+        [RFRateMe showRateAlertForAppStoreUrl:appStoreUrl];
     }
-
-
 }
 
-
-+(void)showRateAlertAfterDays:(int)times {
-    
++ (void)showRateAlertForAppStoreUrl:(NSString *)appStoreUrl afterDays:(int)times
+{
     BOOL rateCompleted = [[NSUserDefaults standardUserDefaults] boolForKey:@"RFRateCompleted"];
     if (rateCompleted) return;
     
@@ -138,10 +134,7 @@
                                                         fromDate:startDate
                                                           toDate:endDate
                                                          options:0];
-    
     if ((long)[components day] <= times) return;
-    
-    
 }
 
 @end
